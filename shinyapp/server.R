@@ -1,36 +1,3 @@
-source("https://bioconductor.org/biocLite.R")
-#biocLite('shinyjs')
-#install.packages('shinyjs')
-
-
-library(DT)
-library(data.table)
-library(stringr)
-library(dplyr)
-library(ggplot2)
-library("data.table")
-library("Matrix")
-library("shiny")
-library("annotate")
-library("affy")
-library("oligo")
-library("Biobase")
-library("convert")
-library("SCAN.UPC")
-library("cluster")
-library("affycoretools")
-library("AnnotationHub")
-library("limma")
-library("openxlsx")
-library("shinyHeatmaply")
-library("d3heatmap")
-library("plotly")
-library("shinydashboard")
-library("robustHD")
-library("shinyjs")
-library("V8")
-library(DT)
-library(shiny)
 #selectedrowindex = 0
 
 # Server.R
@@ -42,6 +9,18 @@ shinyServer(function(input, output,session) {
     
     dane <- myData$datapath
     dane <- read.csv(dane, sep=",", header=T)
+    
+    if 
+    (colnames(dane)[1]=="gene_id") 
+      rownames(dane) <- dane[,1]
+    else
+      dane <- dane
+    
+    if 
+    (colnames(dane)[1]=="gene_id") 
+    dane <- dane %>% select(-gene_id)
+    else 
+      dane <- dane
     
     return(dane)
   }
@@ -83,6 +62,7 @@ shinyServer(function(input, output,session) {
    
      selectedrowindex <<- input$sampletable_rows_selected
     selectedrowindex <<- as.numeric(unlist(selectedrowindex))
+    
     selectedrow <- (sampletable()[selectedrowindex,])
     
     if(input$norm=='Norm')
@@ -91,6 +71,14 @@ shinyServer(function(input, output,session) {
       return(selectedrow)
   } )
   
+#  variable2 <- reactive( {
+    
+#    selectedcolindex <<- variable()$variable_cols_selected
+#    selectedcolindex <<- as.numeric(unlist(selectedcolindex))
+    
+#    selectedcol <- (variable()[,selectedcolindex])
+#  } )
+
   
   ##########table_messages##########
   
@@ -129,13 +117,15 @@ shinyServer(function(input, output,session) {
   
   
   ##########table##########
+
   
-  
-  output$sampletable <- DT::renderDataTable({
+ 
+   output$sampletable <- DT::renderDataTable({
     
     sampletable()
- 
-    }, server = TRUE,selection = 'multiple')
+    
+    }, server = TRUE, selection = 'multiple')
+  
   
   
   ##########new_table##########
@@ -143,21 +133,17 @@ shinyServer(function(input, output,session) {
   
   output$selectedrow <- DT::renderDataTable({
     
-
-    selectedrowindex <<- input$sampletable_rows_selected
-    selectedrowindex <<- as.numeric(unlist(selectedrowindex))
-    selectedrow <- (sampletable()[selectedrowindex,])
-    
-    variable <- reactive( {
-      if(input$norm=='Norm')
-        return(selectedrow<-(selectedrow-min(selectedrow))/(max(selectedrow)-min(selectedrow)))
-      if(input$norm=='No_Norm')
-        return(selectedrow)
-    } )
     variable()
     
-  })
+  }, extensions = 'Buttons', options = list(dom = 'Bfrtip', buttons = I('colvis')))
+ 
+  ####################
   
+ # output$sampletable2 <- DT::renderDataTable({
+    
+#    variable2()
+    
+ # }, server = TRUE, selection = list(target = 'column'))
   
   ##########barplot##########
   
@@ -170,7 +156,7 @@ shinyServer(function(input, output,session) {
     data3 <- as.data.table(data3)
     data3$value=as.numeric(data3$value)
     
-    plot_geom_bar_2 <- ggplot(data3, aes(sample , value) ) + 
+    plot_geom_bar_2 <- ggplot(data3, aes(sample , value, fill=gene) ) + 
       geom_bar(aes(fill = factor( gene)), position = "dodge", stat = "identity") 
     # facet_grid(gene ~ .)
     
@@ -182,7 +168,7 @@ shinyServer(function(input, output,session) {
   
   
   output$heatmap <- renderD3heatmap({
-
+    
      d3heatmap(variable(), scale = "column")
   })
   
