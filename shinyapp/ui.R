@@ -1,33 +1,11 @@
-#source("https://bioconductor.org/biocLite.R")
-#biocLite('stringi')
-#install.packages('shinyjs')
+list.of.packages <- c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
 
-#packages
+Vectorize(require)(package = c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2"), character.only = TRUE)
 
-if (!require(DT)) install.packages("DT")
-if (!require(data.table)) install.packages("data.table")
-if (!require(stringr)) install.packages("stringr")
-if (!require(stringi)) install.packages("stringi")
-if (!require(dplyr)) install.packages("dplyr")
-if (!require(ggplot2)) install.packages("ggplot2")
-if (!require(shiny)) install.packages("shiny")
-if (!require(openxlsx)) install.packages("openxlsx")
-if (!require(d3heatmap)) install.packages("d3heatmap")
-if (!require(shinyjs)) install.packages("shinyjs")
-if (!require(reshape2)) install.packages("reshape2")
 
-#library
-
-library(DT)
-library(data.table)
-library(stringr)
-library(dplyr)
-library(ggplot2)
-library(shiny)
-library(openxlsx)
-library(d3heatmap)
-library(shinyjs)
-library(reshape2)
+##########UI##########
 
 jsResetCode <- "shinyjs.reset = function() {history.go(0)}"
 style = "background-color:  #ffffcc"
