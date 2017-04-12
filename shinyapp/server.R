@@ -8,7 +8,7 @@ shinyServer(function(input, output,session) {
   fun<- function(myData){ 
     
     dane <- myData$datapath
-    dane <- read.csv(dane, sep=",", header=T)
+    dane <- data.frame(read.csv(dane, sep=",", header=T))
     
     if 
     (colnames(dane)[1]=="gene_id") 
@@ -22,34 +22,51 @@ shinyServer(function(input, output,session) {
     else 
       dane <- dane
     
+    
     return(dane)
   }
   
   
   myData <- reactive({
     inFile <- input$file1
+    
     if (is.null(inFile))
       return(NULL)
     inFile
   }) 
   
   
+  New_Input <- reactive({
+
+    inFile <- input$file1
+    data.frame(read.csv(input$file1$datapath))
+  })
+  
+  
   observeEvent(input$analysis, {
     myData <- myData()
+
     if (is.null(myData$datapath)){
       return(NULL)
-    } 
+    }
+    updateSelectInput(session,
+                      inputId = "columns",
+                      choices = names(New_Input()))
     return(myData)
   })
   
+ 
   
   observeEvent(input$refresh_button, {
     js$reset()
   })     
 
+
   
   sampletable <- eventReactive(input$analysis, {
     myData <- myData()
+
+    
     if (!is.null(myData)){
       Tab <- fun(myData)
       
@@ -57,13 +74,20 @@ shinyServer(function(input, output,session) {
     }  
   })
   
+
   
   variable <- reactive( {
-   
-     selectedrowindex <<- input$sampletable_rows_selected
+
+    colindex <- input$columns
+    
+    selectedrowindex <<- input$sampletable_rows_selected
+     
     selectedrowindex <<- as.numeric(unlist(selectedrowindex))
     
     selectedrow <- (sampletable()[selectedrowindex,])
+    
+    selectedrow <- selectedrow[, as.numeric( c(which(colnames(selectedrow) %in% (colindex) )))]
+    
     
     if(input$norm=='Norm')
       return(selectedrow<-(selectedrow-min(selectedrow))/(max(selectedrow)-min(selectedrow)))
@@ -71,14 +95,7 @@ shinyServer(function(input, output,session) {
       return(selectedrow)
   } )
   
-#  variable2 <- reactive( {
-    
-#    selectedcolindex <<- variable()$variable_cols_selected
-#    selectedcolindex <<- as.numeric(unlist(selectedcolindex))
-    
-#    selectedcol <- (variable()[,selectedcolindex])
-#  } )
-
+ 
   
   ##########table_messages##########
   
@@ -116,13 +133,14 @@ shinyServer(function(input, output,session) {
   })
   
   
+  
   ##########table##########
 
   
  
    output$sampletable <- DT::renderDataTable({
-    
-    sampletable()
+     
+     sampletable()
     
     }, server = TRUE, selection = 'multiple')
   
@@ -133,25 +151,19 @@ shinyServer(function(input, output,session) {
   
   output$selectedrow <- DT::renderDataTable({
     
-    variable()
+   round(variable(),2)
     
-  }, extensions = 'Buttons', options = list(dom = 'Bfrtip', buttons = I('colvis')))
+  })
  
-  ####################
-  
- # output$sampletable2 <- DT::renderDataTable({
-    
-#    variable2()
-    
- # }, server = TRUE, selection = list(target = 'column'))
+
   
   ##########barplot##########
   
   
   output$plot <- renderPlot({
     
-    dane2 <- cbind(variable(), rownames(variable()))
-    data3 <- melt(dane2)
+    data2 <- cbind(variable(), rownames(variable()))
+    data3 <- melt(data2)
     colnames(data3) <- c("gene", "sample", "value")
     data3 <- as.data.table(data3)
     data3$value=as.numeric(data3$value)
@@ -161,6 +173,7 @@ shinyServer(function(input, output,session) {
     # facet_grid(gene ~ .)
     
     plot_geom_bar_2
+    
   })
   
   
@@ -170,8 +183,9 @@ shinyServer(function(input, output,session) {
   output$heatmap <- renderD3heatmap({
     
      d3heatmap(variable(), scale = "column")
+    
   })
-  
 
+  
  
 })

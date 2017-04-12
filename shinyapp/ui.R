@@ -1,5 +1,5 @@
 #source("https://bioconductor.org/biocLite.R")
-#biocLite('reshape2')
+#biocLite('stringi')
 #install.packages('shinyjs')
 
 #packages
@@ -7,6 +7,7 @@
 if (!require(DT)) install.packages("DT")
 if (!require(data.table)) install.packages("data.table")
 if (!require(stringr)) install.packages("stringr")
+if (!require(stringi)) install.packages("stringi")
 if (!require(dplyr)) install.packages("dplyr")
 if (!require(ggplot2)) install.packages("ggplot2")
 if (!require(shiny)) install.packages("shiny")
@@ -38,32 +39,37 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
   "))
   ),
   
-  tags$hr(),
   headerPanel(h1("RNA Seq Data Visualization ", 
                  style = "font-family: 'Lobster', cursive;
                  font-weight: 1200; color: #990000; text-align: center;")),
   br(),
+  br(),
+  br(),
   tags$hr(),
-  br(),
-  br(),
   sidebarLayout(
     sidebarPanel( style = "background-color:  #80b3ff;",
       fileInput("file1", label = h4("Choose your file (.csv):"), multiple = FALSE, accept = c(".csv")),
-      actionButton("analysis", "Run"),
-   br(),
-   br(),
-   useShinyjs(),                                        
-   extendShinyjs(text = jsResetCode),                     
-   actionButton("refresh_button",  "Refresh"),
-      br(),
-      br(),
       
-      radioButtons('norm', 'Standarization:',
+      tags$hr(),
+      h4("Please, push the button to start the analysis."),
+      actionButton("analysis", "Run"),
+      
+      tags$hr(),
+      selectInput ("columns",h4("Choose samples:"),
+                   choices="",    selected=TRUE, multiple = TRUE),
+
+      useShinyjs(),                                        
+      extendShinyjs(text = jsResetCode), 
+
+      tags$hr(),
+      radioButtons('norm', h4('Standarization:'),
                    c(No = 'No_Norm',
                      Yes = 'Norm'),
                    'No_Norm'),
+      
       tags$hr(),
-      br()
+      actionButton("refresh_button",  "Refresh")
+
     ),
 
    
@@ -74,25 +80,29 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
                            h3("A web application for RNA Seq data visualization.", 
                               style ="font-weight: 500; line-height: 1.1; color: #404040;"),
                            br(),
+                           
                            p("The standarization method is used to normalize the data.", 
                              style ="font-weight: 500; line-height: 1.1; color: #404040;"),
                            br(),
+                           
                            h4("Data Format  :", 
                               style ="font-weight: 500; line-height: 1.1; color: #404040;"),
+                           
                            p("- ",tags$b("'.csv'"), "are requied. ", 
                              style ="font-weight: 500; line-height: 1.1; color: #404040;") ,
+                           
                            p("- First/Left-hand column must be gene identifiers ",tags$b("'(gene_id)'"), ", or rownames must be gene identifiers.", 
                              style ="font-weight: 500; line-height: 1.1; color: #404040;") , 
+                           
                            p("- Colnames must be the names of samples.", 
                              style ="font-weight: 500; line-height: 1.1; color: #404040;") 
                            
                   ),
                   tabPanel("Interactive Table", uiOutput("tableMessage1"),
                            DT::dataTableOutput("sampletable")
+                          
                   ),
-                 # tabPanel("Interactive Table2", 
-                  #         DT::dataTableOutput("sampletable2")
-                  #),
+                  
                   tabPanel("Selected data", uiOutput("tableMessage2"),
                            DT::dataTableOutput("selectedrow")
                   ),
@@ -102,8 +112,7 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
                   ),
                   tabPanel("Barplot",uiOutput("tableMessage4"),
                            plotOutput("plot")
-                  
-                  )
+                 )
                   ))
       )
     )
