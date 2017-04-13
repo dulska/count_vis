@@ -1,8 +1,8 @@
-list.of.packages <- c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2")
+list.of.packages <- c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-Vectorize(require)(package = c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2"), character.only = TRUE)
+Vectorize(require)(package = c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8"), character.only = TRUE)
 
 
 ##########UI##########
@@ -46,6 +46,7 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
                    'No_Norm'),
       
       tags$hr(),
+      downloadButton('selectedData', 'Download Selected Data'),
       actionButton("refresh_button",  "Refresh")
 
     ),
@@ -86,9 +87,28 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
                   ),
 
                   tabPanel("Heatmap",uiOutput("tableMessage3"),
+                           br(),
+                           downloadButton('downloadheatmap2', 'Download Plot'),
+                           br(),
+                           br(),
+                           numericInput("width", "Width [cm]:", value =""),
+                           numericInput("height", "Height [cm]:", value =""),
+                           br(),
+                           br(),
+                           plotOutput("heatmap2"),
+                           br(),
+                           br(),
                            d3heatmapOutput("heatmap")
                   ),
                   tabPanel("Barplot",uiOutput("tableMessage4"),
+                           br(),
+                           downloadButton('downloadPlot', 'Download Plot'),
+                           br(),
+                           br(),
+                           numericInput("width2", "Width [cm]:", value =""),
+                           numericInput("height2", "Height [cm]:", value =""),
+                           br(),
+                           br(),
                            plotOutput("plot")
                  )
                   ))

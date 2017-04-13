@@ -61,7 +61,7 @@ shinyServer(function(input, output,session) {
     js$reset()
   })     
 
-
+  
   
   sampletable <- eventReactive(input$analysis, {
     myData <- myData()
@@ -84,9 +84,10 @@ shinyServer(function(input, output,session) {
      
     selectedrowindex <<- as.numeric(unlist(selectedrowindex))
     
-    selectedrow <- (sampletable()[selectedrowindex,])
+    selectedrow <- (round(sampletable(),0)[selectedrowindex,])
     
     selectedrow <- selectedrow[, as.numeric( c(which(colnames(selectedrow) %in% (colindex) )))]
+    
     
     
     if(input$norm=='Norm')
@@ -95,7 +96,18 @@ shinyServer(function(input, output,session) {
       return(selectedrow)
   } )
   
- 
+  ##########download_selected_data##########
+  
+  
+  output$selectedData <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(round(variable(),2), file)
+
+    }
+  )
   
   ##########table_messages##########
   
@@ -140,7 +152,7 @@ shinyServer(function(input, output,session) {
  
    output$sampletable <- DT::renderDataTable({
      
-     sampletable()
+     round(sampletable(),0)
     
     }, server = TRUE, selection = 'multiple')
   
@@ -158,9 +170,7 @@ shinyServer(function(input, output,session) {
 
   
   ##########barplot##########
-  
-  
-  output$plot <- renderPlot({
+  plotInput <- reactive ({
     
     data2 <- cbind(variable(), rownames(variable()))
     data3 <- melt(data2)
@@ -170,10 +180,19 @@ shinyServer(function(input, output,session) {
     
     plot_geom_bar_2 <- ggplot(data3, aes(sample , value, fill=gene) ) + 
       geom_bar(aes(fill = factor( gene)), position = "dodge", stat = "identity") 
+     # width = as.integer(input$slider)
     # facet_grid(gene ~ .)
     
-    plot_geom_bar_2
+
     
+  })
+  
+  output$plot <- renderPlot({
+    
+
+  print(plotInput())
+  
+  
   })
   
   
@@ -186,6 +205,40 @@ shinyServer(function(input, output,session) {
     
   })
 
+  heatmap2Input <- reactive ({
+    
+    data4 <- variable()
+    data4$Name <- rownames(data4)
+    data4.m <- melt(data4)
+    data4.m <- ddply(data4.m, .(variable), transform, rescale=rescale(value))
+    p2 <- ggplot(data4.m, aes(variable, Name)) + geom_tile(aes(fill = value), colour = "white") 
+    
+  })
+  
+  output$heatmap2 <- renderPlot({
+    
+
+    print(heatmap2Input())
+    
+
+  })
+  
+  
+  output$downloadPlot <- downloadHandler(
+    
+    filename = "Shinyplot.png",
+    content = function(file) {
+    ggsave(file,plotInput(), width = input$width2, height = input$height2, units = "cm")
+    #dev.off()
+    }) 
+  
+  output$downloadheatmap2 <- downloadHandler(
+    
+    filename = "Shinyplot.png",
+    content = function(file) {
+      ggsave(file,heatmap2Input(), width = input$width, height = input$height, units = "cm")
+      #dev.off()
+    })
   
  
 })
