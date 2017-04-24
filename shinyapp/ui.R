@@ -1,15 +1,16 @@
-list.of.packages <- c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8")
+list.of.packages <- c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8", "canvasXpress")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-Vectorize(require)(package = c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8"), character.only = TRUE)
+Vectorize(require)(package = c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8", "canvasXpress"), character.only = TRUE)
 
+#devtools::install_github('neuhausi/canvasXpress')
 
 ##########UI##########
 
 jsResetCode <- "shinyjs.reset = function() {history.go(0)}"
-style = "background-color:  #ffffcc"
-shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
+style = "background-color:  #ffffff"
+shinyUI(fluidPage(style = "background-color:  #ffffff; irs-line: #b30000",
   
   tags$head(
     tags$style(HTML("
@@ -19,13 +20,13 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
   
   headerPanel(h1("RNA Seq Data Visualization ", 
                  style = "font-family: 'Lobster', cursive;
-                 font-weight: 1200; color: #990000; text-align: center;")),
+                 font-weight: 1200; color: #00b36b; text-align: center;")),
   br(),
   br(),
   br(),
   tags$hr(),
   sidebarLayout(
-    sidebarPanel( style = "background-color:  #80b3ff;",
+    sidebarPanel( style = "background-color:  #00ff99;",
       fileInput("file1", label = h4("Choose your file (.csv):"), multiple = FALSE, accept = c(".csv")),
       
       tags$hr(),
@@ -46,18 +47,22 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
                    'No_Norm'),
       
       tags$hr(),
-      downloadButton('selectedData', 'Download Selected Data'),
+      downloadButton('selectedData.csv', 'Download Selected Data (.csv)'),
       actionButton("refresh_button",  "Refresh")
 
     ),
 
    
     mainPanel(
-      mainPanel(style = "background-color:  #ffffcc;", tabsetPanel(type = "tabs",
+      mainPanel(style = "background-color:  #ffffff;", tabsetPanel(type = "tabs",
                   tabPanel("Description", uiOutput("descript"),
                            
                            h3("A web application for RNA Seq data visualization.", 
                               style ="font-weight: 500; line-height: 1.1; color: #404040;"),
+                           br(),
+                           
+                           p("This is a Shiny app to visualize any count tables mostly supported to RNASeq data.", 
+                             style ="font-weight: 500; line-height: 1.1; color: #404040;"),
                            br(),
                            
                            p("The standarization method is used to normalize the data.", 
@@ -88,7 +93,7 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
 
                   tabPanel("Heatmap",uiOutput("tableMessage3"),
                            br(),
-                           downloadButton('downloadheatmap2', 'Download Plot'),
+                           downloadButton('downloadheatmap.png', 'Download Plot (.png)'),
                            br(),
                            br(),
                            numericInput("width", "Width [cm]:", value =""),
@@ -102,7 +107,7 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
                   ),
                   tabPanel("Barplot",uiOutput("tableMessage4"),
                            br(),
-                           downloadButton('downloadPlot', 'Download Plot'),
+                           downloadButton('downloadPlot.png', 'Download Plot (.png)'),
                            br(),
                            br(),
                            numericInput("width2", "Width [cm]:", value =""),
@@ -110,6 +115,7 @@ shinyUI(fluidPage(style = "background-color:  #ffffcc; irs-line: #b30000",
                            br(),
                            br(),
                            plotOutput("plot")
+
                  )
                   ))
       )

@@ -99,7 +99,7 @@ shinyServer(function(input, output,session) {
   ##########download_selected_data##########
   
   
-  output$selectedData <- downloadHandler(
+  output$selectedData.csv <- downloadHandler(
     filename = function() {
       paste("data-", Sys.Date(), ".csv", sep="")
     },
@@ -224,20 +224,20 @@ shinyServer(function(input, output,session) {
   })
   
   
-  output$downloadPlot <- downloadHandler(
+  output$downloadPlot.png <- downloadHandler(
     
     filename = "Shinyplot.png",
     content = function(file) {
     ggsave(file,plotInput(), width = input$width2, height = input$height2, units = "cm")
-    #dev.off()
+
     }) 
   
-  output$downloadheatmap2 <- downloadHandler(
+  output$downloadheatmap.png <- downloadHandler(
     
     filename = "Shinyplot.png",
     content = function(file) {
       ggsave(file,heatmap2Input(), width = input$width, height = input$height, units = "cm")
-      #dev.off()
+
     })
   
  
