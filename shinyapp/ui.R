@@ -1,10 +1,9 @@
-list.of.packages <- c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8", "canvasXpress")
+list.of.packages <- c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-Vectorize(require)(package = c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8", "canvasXpress"), character.only = TRUE)
+Vectorize(require)(package = c("DT","data.table", "stringr", "stringi", "dplyr", "ggplot2","shiny", "openxlsx", "d3heatmap", "shinyjs", "reshape2", "plyr", "scales", "V8"), character.only = TRUE)
 
-#devtools::install_github('neuhausi/canvasXpress')
 
 ##########UI##########
 
@@ -57,11 +56,11 @@ shinyUI(fluidPage(style = "background-color:  #ffffff; irs-line: #b30000",
       mainPanel(style = "background-color:  #ffffff;", tabsetPanel(type = "tabs",
                   tabPanel("Description", uiOutput("descript"),
                            
-                           h3("A web application for RNA Seq data visualization.", 
-                              style ="font-weight: 500; line-height: 1.1; color: #404040;"),
+                          # h3("A web application for RNA Seq data visualization.", 
+                          #    style ="font-weight: 500; line-height: 1.1; color: #404040;"),
                            br(),
                            
-                           p("This is a Shiny app to visualize any count tables mostly supported to RNASeq data.", 
+                           h4("This is a Shiny app to visualize any count tables mostly supported to RNASeq data.", 
                              style ="font-weight: 500; line-height: 1.1; color: #404040;"),
                            br(),
                            

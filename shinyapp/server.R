@@ -180,7 +180,6 @@ shinyServer(function(input, output,session) {
     
     plot_geom_bar_2 <- ggplot(data3, aes(sample , value, fill=gene) ) + 
       geom_bar(aes(fill = factor( gene)), position = "dodge", stat = "identity") 
-     # width = as.integer(input$slider)
     # facet_grid(gene ~ .)
     
 
